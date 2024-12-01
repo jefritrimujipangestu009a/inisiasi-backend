@@ -18,29 +18,23 @@ async function register(username, email, password) {
     let newUser = await userRepository.createUser(user);
     return newUser;
   } catch (error) {
-    console.error(`Error in user registration: ${error.message}`);
     throw new Error("Failed to register user");
   }
 }
 
 async function login(username, password) {
-  try {
-    let user = await userRepository.findUserByUsername(username);
-    if (!user) {
-      throw new Error("Invalid username or password");
-    }
-
-    let isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      throw new Error("Invalid username or password");
-    }
-
-    let token = generateToken(user);
-    return { user, token };
-  } catch (error) {
-    console.error(`Error during login: ${error.message}`);
-    throw new Error("Login failed");
+  let user = await userRepository.findUserByUsername(username);
+  if (!user) {
+    throw new Error("Invalid username or password");
   }
+
+  let isValidPassword = await bcrypt.compare(password, user.password);
+
+  if (!isValidPassword) {
+    throw new Error("Invalid username or password");
+  }
+  let token = generateToken(user);
+  return { user, token };
 }
 
 module.exports = { register, login };
